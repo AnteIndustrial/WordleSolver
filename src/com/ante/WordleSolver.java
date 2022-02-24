@@ -2,9 +2,19 @@ package com.ante;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Scanner;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class WordleSolver {
+
+    static final Logger LOGGER = Logger.getLogger(WordleSolver.class.getName());
 
     public static final String ALPHABET = "abcdefghijklmnopqrstuvwxyz";
     public static final int WORD_LENGTH = 5;
@@ -97,17 +107,157 @@ public class WordleSolver {
     public static void main(String[] args) {
         WordleSolver solver = new WordleSolver();
         Scanner reader = new Scanner(System.in);
+        System.out.println("1: manual solver");
+        System.out.println("2: auto solver");
+        System.out.println("3: bulk solver");
+        //or d1, d2, d3 to turn on debug logging
 
-        System.out.println(solver.scoredWords.get(solver.scoredWords.size() - 1));
+        String input = reader.nextLine();
+        if(input.length() == 2 && input.charAt(0) == 'd'){
+            solver.setDebug();
+            input = input.substring(1);
+        }
+        switch (input) {
+            case "1" -> solver.manualSolver(reader);
+            case "2" -> solver.autoSolver(reader);
+            case "3" -> solver.bulkSolver();
+        }
+    }
+
+    private void setDebug() {
+        ConsoleHandler handler = new ConsoleHandler();
+        handler.setLevel(Level.FINER);
+        LOGGER.setLevel(Level.FINER);
+        LOGGER.addHandler(handler);
+    }
+
+    private void bulkSolver() {
+        List<String> allWords = getWords();
+
+        Map<String, Integer> guessesPerWord = new HashMap<>(allWords.size());
+        for(String target : allWords){
+            LOGGER.log(Level.FINE, "Target: " + target);
+            int guesses = 0;
+            ScoredWord currentGuess;
+            do{
+                if(scoredWords.size() == 0){
+                    LOGGER.log(Level.SEVERE, "failed on " + target);
+                    guesses = 50;
+                    break;
+                }
+                currentGuess = scoredWords.get(scoredWords.size() - 1);
+                LOGGER.log(Level.FINE, "Guessing: " + currentGuess);
+                WordResult result = guess(currentGuess.getWord(), target);
+
+                removeInvalidOptions(result);
+                guesses++;
+                if(guesses == 20){
+                    LOGGER.log(Level.SEVERE, "breaking");
+                    break;
+                }
+            } while((!currentGuess.getWord().equals(target)));
+            guessesPerWord.put(target, guesses);
+            scoreWords(allWords);
+            Collections.sort(scoredWords);
+        }
+        Map<Integer, Integer> totalGuesses = new HashMap<>();
+        for(String key : guessesPerWord.keySet()){
+            Integer guess = guessesPerWord.get(key);
+            if(guess > 5){
+                System.out.println(key + " took " + guess + " guesses");
+            }
+            if(totalGuesses.containsKey(guess)){
+                totalGuesses.put(guess, totalGuesses.get(guess) + 1);
+            } else {
+                totalGuesses.put(guess, 1);
+            }
+        }
+        System.out.println(totalGuesses);
+    }
+
+    private void autoSolver(Scanner reader) {
+        System.out.println("Enter target word");
+        String target = reader.nextLine();
+        int guesses = 0;
+        ScoredWord currentGuess;
+        do{
+            currentGuess = scoredWords.get(scoredWords.size() - 1);
+            System.out.println("Guessing " + currentGuess.getWord());
+
+            WordResult result = guess(currentGuess.getWord(), target);
+
+            LOGGER.log(Level.FINE, result.toString());
+
+            removeInvalidOptions(result);
+            guesses++;
+            if(guesses == 20){
+                System.out.println("breaking");
+                break;
+            }
+        } while((!currentGuess.getWord().equals(target)));
+
+        System.out.println("Solved in " + guesses + " guesses");
+    }
+
+    static WordResult guess(String currentGuess, String target) {
+        List<LetterResult> letterResults = new ArrayList<>();
+        Map<Character, Integer> numOfCharsInTarget = WordResult.calculateNumOfCharsInAWord(target);
+        Map<Character, Integer> numOfCharsInGuess = WordResult.calculateNumOfCharsInAWord(currentGuess);
+        Map<Character, Integer> duplicates = new HashMap<>();
+
+        for(int i = 0; i < WORD_LENGTH; i++){
+            char currentChar = currentGuess.charAt(i);
+            if(currentChar == target.charAt(i)){
+                LOGGER.log(Level.FINE, "Right position: " + currentChar);
+                if(duplicates.containsKey(currentChar)){
+                    duplicates.put(currentChar, duplicates.get(currentChar) + 1);
+                } else {
+                    duplicates.put(currentChar, 1);
+                }
+                letterResults.add(LetterResult.RIGHT_POSITION);
+
+            } else if(target.indexOf(currentChar) == -1){
+                LOGGER.log(Level.FINE, "Not in word: " + currentChar);
+                letterResults.add(LetterResult.NOT_IN_WORD);
+            }
+        }
+        for(int i = 0; i < WORD_LENGTH; i++){
+            char currentChar = currentGuess.charAt(i);
+             if(!(currentChar == target.charAt(i)) && !(target.indexOf(currentChar) == -1)) {
+                if(numOfCharsInTarget.get(currentChar) >= numOfCharsInGuess.get(currentChar)){
+                    LOGGER.fine("Wrong position: " + currentChar);
+                    letterResults.add(i, LetterResult.WRONG_POSITION);
+                } else {
+                    if(duplicates.containsKey(currentChar)){
+                        duplicates.put(currentChar, duplicates.get(currentChar) + 1);
+                    } else {
+                        duplicates.put(currentChar, 1);
+                    }
+                    if(numOfCharsInTarget.get(currentChar)  >= duplicates.get(currentChar)){
+                        LOGGER.fine("Wrong position: " + currentChar);
+                        letterResults.add(i, LetterResult.WRONG_POSITION);
+                    } else {
+                        LOGGER.fine("Duplicate, Not in word: " + currentChar);
+                        letterResults.add(i, LetterResult.NOT_IN_WORD);
+                    }
+                }
+            }
+        }
+
+        return new WordResult(currentGuess, letterResults);
+    }
+
+    private void manualSolver(Scanner reader) {
+        System.out.println(scoredWords.get(scoredWords.size() - 1));
         System.out.println("Enter attempted word and results in the format 'word RRWWN'");
         System.out.println("Where R = letter in right position, W = letter in wrong position, and N = letter not in word");
 
         for(int i = 0; i < NUMBER_OF_GUESSES; i++) {
             String input = reader.nextLine();
-            WordResult wordResult = solver.parseResult(input);
-            solver.removeInvalidOptions(wordResult);
-            System.out.println(solver.scoredWords);
-            System.out.println(solver.scoredWords.get(solver.scoredWords.size() - 1));
+            WordResult wordResult = parseResult(input);
+            removeInvalidOptions(wordResult);
+            System.out.println(scoredWords);
+            System.out.println(scoredWords.get(scoredWords.size() - 1));
         }
     }
 
@@ -127,14 +277,14 @@ public class WordleSolver {
         if(split.length != 2){
             throw new RuntimeException("invalid input format");
         }
-        String attemptedWord = split[0];
-        String results = split[1];
+        String attemptedWord = split[0].toLowerCase();
+        String results = split[1].toUpperCase();
         if(results.length() != WORD_LENGTH){
             throw new RuntimeException("invalid result format");
         }
         List<LetterResult> letterResults = new ArrayList<>();
-        for(int i = 0; i < WORD_LENGTH; i++){
-            switch (results.charAt(i)) {
+        for(char c : results.toCharArray()){
+            switch (c) {
                 case 'R' -> letterResults.add(LetterResult.RIGHT_POSITION);
                 case 'W' -> letterResults.add(LetterResult.WRONG_POSITION);
                 case 'N' -> letterResults.add(LetterResult.NOT_IN_WORD);

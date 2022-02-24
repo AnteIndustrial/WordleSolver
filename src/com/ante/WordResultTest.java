@@ -2,11 +2,23 @@ package com.ante;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Level;
+
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static com.ante.WordResult.LOGGER;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class WordResultTest {
+
+    private void setLoggingToFine() {
+        LOGGER.setLevel(Level.FINE);
+        ConsoleHandler handler = new ConsoleHandler();
+        handler.setLevel(Level.FINER);
+        LOGGER.addHandler(handler);
+    }
 
     @Test
     void isValidMultipleCases(){
@@ -77,7 +89,6 @@ class WordResultTest {
 
     @Test
     void isValidReturnsFalseWhenResultSaysNoDoublesAndWordContainsDouble() {
-
         List<LetterResult> list = new ArrayList<>();
         list.add(LetterResult.RIGHT_POSITION);
         list.add(LetterResult.RIGHT_POSITION);
@@ -86,5 +97,29 @@ class WordResultTest {
         list.add(LetterResult.NOT_IN_WORD);
         WordResult result = new WordResult("proof", list);
         assertFalse(result.isValid("promo"));
+    }
+
+    @Test
+    void testWherePreviousWordHasLetterTwiceAndTargetWordHasItOnce(){
+        List<LetterResult> list = new ArrayList<>();
+        list.add(LetterResult.RIGHT_POSITION);
+        list.add(LetterResult.RIGHT_POSITION);
+        list.add(LetterResult.RIGHT_POSITION);
+        list.add(LetterResult.NOT_IN_WORD);
+        list.add(LetterResult.NOT_IN_WORD);
+        WordResult result = new WordResult("proof", list);
+        assertTrue(result.isValid("promt"));
+    }
+
+    @Test
+    void test(){
+        List<LetterResult> list = new ArrayList<>();
+        list.add(LetterResult.WRONG_POSITION);
+        list.add(LetterResult.RIGHT_POSITION);
+        list.add(LetterResult.RIGHT_POSITION);
+        list.add(LetterResult.NOT_IN_WORD);
+        list.add(LetterResult.NOT_IN_WORD);
+        WordResult result = new WordResult("trait", list);
+        assertTrue(result.isValid("wrath"));
     }
 }
