@@ -34,6 +34,6 @@ public class Range
 
     @Override
     public String toString(){
-        return "[" + low + " - " + high + "]";
+        return String.format("[%s - %s]", low, high);
     }
 }

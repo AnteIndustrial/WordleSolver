@@ -90,7 +90,7 @@ public class WordResult {
     }
 
     public boolean isValid(String inputWord) {
-        LOGGER.log(Level.FINE, "comparing " + inputWord + " to previous result " + this);
+        LOGGER.fine(String.format("comparing %s to previous result %s", inputWord, this));
 
         Map<Character, Integer> numOfCharsInInputWord = calculateNumOfCharsInAWord(inputWord);
         for(char c : inputWord.toCharArray()){
@@ -103,23 +103,23 @@ public class WordResult {
             switch (getResult(i)) {
                 case RIGHT_POSITION:
                     if (!Character.toString(inputWord.charAt(i)).equals(getLetter(i))) {
-                        LOGGER.log(Level.FINE, "right position invalid at index " + i);
+                        LOGGER.fine(String.format("right position invalid at index %s", i));
                         return false;
                     }
                     break;
                 case WRONG_POSITION:
                     if (Character.toString(inputWord.charAt(i)).equals(getLetter(i))) {
-                        LOGGER.log(Level.FINE, "wrong position invalid at index " + i);
+                        LOGGER.fine(String.format("wrong position invalid at index %s", i));
                         return false;
                     } else {
                         if (!inputWord.contains(getLetter(i))) {
-                            LOGGER.log(Level.FINE, "word doesn't contain letter at index " + i);
+                            LOGGER.fine(String.format("word doesn't contain letter at index %s", i));
                             return false;
                         }
                     }
                     break;
             }
-            LOGGER.log(Level.FINE, "results valid at index " + i);
+            LOGGER.fine(String.format("results valid at index %s", i));
 
         }
         return true;
@@ -127,7 +127,7 @@ public class WordResult {
 
     @Override
     public String toString(){
-        return "[" + word + ", " + results + "]";
+        return String.format("[%s, %s]", word, results);
     }
 
     @Override
