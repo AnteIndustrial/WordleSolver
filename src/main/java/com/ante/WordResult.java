@@ -11,8 +11,8 @@ import java.util.logging.Logger;
 public class WordResult {
 
     static final Logger LOGGER = Logger.getLogger(WordResult.class.getName());
-    String word;
-    List<LetterResult> results;
+    final String word;
+    final List<LetterResult> results;
     Map<Character, Range> numOfCharsInTargetWord;
 
     public WordResult(String word, List<LetterResult> results){

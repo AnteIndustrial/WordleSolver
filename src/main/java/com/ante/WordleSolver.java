@@ -159,7 +159,6 @@ public class WordleSolver {
             } while((!currentGuess.getWord().equals(target)));
             guessesPerWord.put(target, guesses);
             scoreWords(allWords);
-            Collections.sort(scoredWords);
         }
         Map<Integer, Integer> totalGuesses = new HashMap<>();
         for(String key : guessesPerWord.keySet()){
@@ -277,7 +276,6 @@ public class WordleSolver {
             }
         }
         scoreWords(reducedList);
-        Collections.sort(scoredWords);
     }
 
     /**
