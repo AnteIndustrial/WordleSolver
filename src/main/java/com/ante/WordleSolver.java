@@ -30,7 +30,7 @@ public class WordleSolver {
 
     /**
      * Give every word a score based on how frequently its letters appear in the dictionary
-     * @param words a list of dictionary words
+     * @param words a list of dictionary words.txt
      */
     private void scoreWords(List<String> words) {
         countLettersAtPositions(words);
@@ -61,7 +61,7 @@ public class WordleSolver {
 
     /**
      * Count how often each letter appears in each position
-     * @param words a list of dictionary words
+     * @param words a list of dictionary words.txt
      */
     private void countLettersAtPositions(List<String> words) {
         initialiseCountAtPositionList();
@@ -88,13 +88,13 @@ public class WordleSolver {
     }
 
     /**
-     * read a dictionary for a list of words
-     * @return a list of words
+     * read a dictionary for a list of words.txt
+     * @return a list of words.txt
      */
     private List<String> getWords() {
         List<String> words = new ArrayList<>();
 
-        try(Scanner sc = new Scanner(new File(("src/resources/smallwords.txt")))){
+        try(Scanner sc = new Scanner(new File(("src/main/resources/smallwords.txt")))){
             while(sc.hasNextLine()){
                 words.add(sc.nextLine());
             }

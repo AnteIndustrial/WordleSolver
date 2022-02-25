@@ -1,3 +1,33 @@
+Skip to content
+Why GitHub?
+Team
+Enterprise
+Explore
+Marketplace
+Pricing
+Search
+Sign in
+Sign up
+AnteIndustrial
+/
+WordleSolver
+Public
+Code
+Issues
+Pull requests
+Actions
+Projects
+Wiki
+Security
+Insights
+WordleSolver/src/resources/words.txt
+
+Sean first commit
+Latest commit 30a158f 15 days ago
+ History
+ 0 contributors
+5757 lines (5757 sloc)  33.7 KB
+
 which
 there
 their
