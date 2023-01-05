@@ -35,8 +35,8 @@ public class WordResult {
 
     private void calculateNumOfCharsInTargetWord(String word, List<LetterResult> results) {
         numOfCharsInTargetWord = new HashMap<>();
-        for(char c : WordleSolver.ALPHABET.toCharArray()){
-            numOfCharsInTargetWord.put(c, new Range(0,WordleSolver.WORD_LENGTH));
+        for(char c : WordleDriver.ALPHABET.toCharArray()){
+            numOfCharsInTargetWord.put(c, new Range(0, WordleDriver.WORD_LENGTH));
         }
 
         Map<Character, List<LetterResult>> lettersToResult = new HashMap<>();
@@ -62,7 +62,7 @@ public class WordResult {
             if((lettersToResult.get(c).contains(LetterResult.RIGHT_POSITION) ||
                     lettersToResult.get(c).contains(LetterResult.WRONG_POSITION)) &&
                     !lettersToResult.get(c).contains(LetterResult.NOT_IN_WORD)){
-                numOfCharsInTargetWord.get(c).intersect(new Range(lettersToResult.get(c).size(),WordleSolver.WORD_LENGTH));
+                numOfCharsInTargetWord.get(c).intersect(new Range(lettersToResult.get(c).size(), WordleDriver.WORD_LENGTH));
             }
             //letter is in it, and also there's a grey
             if(lettersToResult.get(c).contains(LetterResult.NOT_IN_WORD) &&
@@ -99,7 +99,7 @@ public class WordResult {
             }
         }
 
-        for (int i = 0; i < WordleSolver.WORD_LENGTH; i++) {
+        for (int i = 0; i < WordleDriver.WORD_LENGTH; i++) {
             switch (getResult(i)) {
                 case RIGHT_POSITION:
                     if (!Character.toString(inputWord.charAt(i)).equals(getLetter(i))) {
