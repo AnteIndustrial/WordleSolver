@@ -37,6 +37,9 @@ public class WordleSolverBasic implements WordleSolver{
         String bestWord = null;
         int bestScore = 0;
 
+        //todo: improve the logic here
+        //this is a sample of what could be here, need to pick a better word than 'gaunt'
+        //[[faint, paint], [datum, daunt, gamut, gaunt, jaunt, vaunt], [], [digit, unfit], [badly, balmy], [train, trait], [smite, spite, suite], [havoc, macho]]
         for(List<ScoredWord> list : listOfScores) {
             if(list.size() == 1){
                 return list.get(0).getWord();

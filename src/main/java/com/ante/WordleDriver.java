@@ -309,6 +309,7 @@ public class WordleDriver {
                 for(LetterResult letterResult : result.results){
                     if(letterResult != LetterResult.RIGHT_POSITION){
                         solved = false;
+                        break;
                     }
                 }
                 if(solved){
